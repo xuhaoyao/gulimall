@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    username: varerleet
+    password: rencai666..
+    url: jdbc:mysql://182.92.2.51:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/product/*.xml
+  global-config:
+    db-config:
+      id-type: auto  #主键自增
+server:
+  port: 10000

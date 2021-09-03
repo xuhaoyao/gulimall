@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 182.92.2.51:8848
+        file-extension: yaml #默认是properties,还可以是yaml(不能写yml),nacos配置中心要写yaml,写yml无效
+        group: gateway #默认是DEFAULT_GROUP
+        namespace: a72cca46-f810-45f0-b7e8-11b32e1ba52c
+      discovery:
+        server-addr: 182.92.2.51:8848
+
+  application:
+    name: gulimall-gateway
+

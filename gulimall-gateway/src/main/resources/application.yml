@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: query_route
+#          uri: https://www.baidu.com
+#          predicates:
+#            - Query=green, red
+
+#server:
+#  port: 88
