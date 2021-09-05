@@ -1,14 +1,30 @@
 spring:
-  profiles:
-    active: dev
+  cloud:
+    gateway:
+      #精确的路由要在前面,即/api/product/**必须要在/api/**前面
+      routes:
+        - id: product_route
+          uri: lb://gulimall-product
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /$\{segment}
 
-#  cloud:
-#    gateway:
-#      routes:
-#        - id: query_route
-#          uri: https://www.baidu.com
-#          predicates:
-#            - Query=green, red
+        - id: thirdparty_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/?(?<segment>.*), /$\{segment}
 
-#server:
-#  port: 88
+        - id: admin_route
+          uri: lb://renren-fast
+          predicates:
+            - Path=/api/**
+          filters:
+            - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
+          #http://localhost:88/api/captcha.jpg -> http://localhost:88/renren-fast/captcha.jpg
+
+server:
+  port: 88
+
