@@ -1,10 +1,11 @@
 package com.scnu.gulimall.product.service.impl;
 
 import com.scnu.common.utils.Query;
+import com.scnu.gulimall.product.dao.CategoryBrandRelationDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    @Autowired
+    private CategoryBrandRelationDao categoryBrandRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -52,6 +56,32 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public void removeBatch(List<Long> ids) {
         //TODO 该菜单被引用时不能删除
         baseMapper.deleteBatchIds(ids);
+    }
+
+    @Override
+    public Long[] getCatelogIdPath(Long catelogId) {
+        List<Long> list = new LinkedList<>();
+        findPath(catelogId,list);
+        Collections.reverse(list);  //递归找出来后,逆序返回
+        return list.toArray(new Long[0]);
+    }
+
+    @Transactional
+    @Override
+    public void updateDetail(CategoryEntity category) {
+        Long catId = category.getCatId();
+        String name = category.getName();
+        categoryBrandRelationDao.updateFromCategory(catId,name);
+        baseMapper.updateById(category);
+    }
+
+    private void findPath(Long catelogId, List<Long> list) {
+        list.add(catelogId);
+        CategoryEntity categoryEntity = baseMapper.selectById(catelogId);
+        Long pid = categoryEntity.getParentCid();
+        if(pid != 0){
+            findPath(pid,list);
+        }
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity menu, List<CategoryEntity> entities) {

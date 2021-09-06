@@ -2,8 +2,11 @@ package com.scnu.gulimall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.scnu.common.utils.PageUtils;
+import com.scnu.gulimall.product.entity.AttrEntity;
 import com.scnu.gulimall.product.entity.AttrGroupEntity;
+import com.scnu.gulimall.product.vo.AttrGroupVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +19,24 @@ import java.util.Map;
 public interface AttrGroupService extends IService<AttrGroupEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 根据catelogId查pms_attr_group表中的数据(三级分类对应的属性分组)
+     */
+    PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
+    /**
+     * 根据分组id查找这个分组下的所有属性值
+     * @param attrgroupId
+     * @return
+     */
+    List<AttrEntity> attrWithGroup(Long attrgroupId);
+
+    /**
+     * 删除关联关系  [{"attrId":1,"attrGroupId":2}]
+     * @param attrGroupVos
+     */
+    void deleteRelation(AttrGroupVo[] attrGroupVos);
+
 }
 

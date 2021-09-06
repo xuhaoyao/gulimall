@@ -10,6 +10,21 @@
         <result property="attrGroupId" column="attr_group_id"/>
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
+    <insert id="attrGroupRelation">
+        insert into pms_attr_attrgroup_relation(attr_id,attr_group_id)
+        values
+            <foreach collection="attrGroupVos" item="vo" separator=",">
+                (#{vo.attrId},#{vo.attrGroupId})
+            </foreach>
+
+    </insert>
+
+    <delete id="deleteRelation">
+        delete from pms_attr_attrgroup_relation where
+        <foreach collection="attrGroupVos" item="vo" separator=" or ">
+            (attr_id = #{vo.attrId} and attr_group_id = #{vo.attrGroupId})
+        </foreach>
+    </delete>
 
 
 </mapper>

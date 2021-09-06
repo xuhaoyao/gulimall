@@ -17,6 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Constraint(validatedBy = { StatusConstraintValidator.class }) //(validateBy指定我们自定义的校验器)
 public @interface StatusValid {
+    //读取ValidationMessages.properties下的信息
     String message() default "{com.scnu.common.valid.StatusValid.message}";
 
     Class<?>[] groups() default { };

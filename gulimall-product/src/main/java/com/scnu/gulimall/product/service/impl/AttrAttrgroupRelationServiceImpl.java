@@ -1,6 +1,7 @@
 package com.scnu.gulimall.product.service.impl;
 
 import com.scnu.common.utils.Query;
+import com.scnu.gulimall.product.vo.AttrGroupVo;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -11,6 +12,7 @@ import com.scnu.common.utils.PageUtils;
 import com.scnu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.scnu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.scnu.gulimall.product.service.AttrAttrgroupRelationService;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service("attrAttrgroupRelationService")
@@ -24,6 +26,12 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
         );
 
         return new PageUtils(page);
+    }
+
+    @Transactional
+    @Override
+    public void attrGroupRelation(AttrGroupVo[] attrGroupVos) {
+        baseMapper.attrGroupRelation(attrGroupVos);
     }
 
 }
