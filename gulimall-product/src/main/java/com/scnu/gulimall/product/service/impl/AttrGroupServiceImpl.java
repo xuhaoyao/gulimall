@@ -5,8 +5,11 @@ import com.scnu.gulimall.product.dao.AttrAttrgroupRelationDao;
 import com.scnu.gulimall.product.dao.AttrDao;
 import com.scnu.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import com.scnu.gulimall.product.entity.AttrEntity;
+import com.scnu.gulimall.product.service.AttrService;
 import com.scnu.gulimall.product.vo.AttrGroupVo;
+import com.scnu.gulimall.product.vo.AttrGroupWithAttrsVo;
 import org.apache.commons.lang.ObjectUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +37,6 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     @Autowired
     private AttrDao attrDao;
 
-    @Autowired
-    private AttrGroupDao attrGroupDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -92,6 +93,27 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
     @Override
     public void deleteRelation(AttrGroupVo[] attrGroupVos) {
         attrAttrgroupRelationDao.deleteRelation(attrGroupVos);
+    }
+
+    @Override
+    public List<AttrGroupWithAttrsVo> attrGroupWithAttr(Long catelogId) {
+        //1.根据此分类id得到所有分组
+        QueryWrapper<AttrGroupEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("catelog_id",catelogId);
+        List<AttrGroupEntity> attrGroupEntities = baseMapper.selectList(wrapper);
+        //2.得到分组下关联的属性
+        List<AttrGroupWithAttrsVo> collect = attrGroupEntities.stream().map(item -> {
+            AttrGroupWithAttrsVo vo = new AttrGroupWithAttrsVo();
+            BeanUtils.copyProperties(item, vo);
+            List<AttrAttrgroupRelationEntity> relationEntities = attrAttrgroupRelationDao.selectList(new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_group_id", item.getAttrGroupId()).select("attr_id"));
+            List<Long> attrIds = relationEntities.stream().map(AttrAttrgroupRelationEntity::getAttrId).collect(Collectors.toList());
+            if (attrIds.size() > 0) {
+                List<AttrEntity> attrEntities = attrDao.selectBatchIds(attrIds);
+                vo.setAttrs(attrEntities);
+            }
+            return vo;
+        }).collect(Collectors.toList());
+        return collect;
     }
 
 

@@ -3,6 +3,7 @@ package com.scnu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.scnu.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +37,7 @@ public class SkuInfoController {
     @RequestMapping("/list")
     //@RequiresPermissions("product:skuinfo:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = skuInfoService.queryPage(params);
+        PageUtils page = skuInfoService.querySkuInfo(params);
 
         return R.ok().put("page", page);
     }
@@ -60,7 +61,6 @@ public class SkuInfoController {
     //@RequiresPermissions("product:skuinfo:save")
     public R save(@RequestBody SkuInfoEntity skuInfo){
 		skuInfoService.save(skuInfo);
-
         return R.ok();
     }
 

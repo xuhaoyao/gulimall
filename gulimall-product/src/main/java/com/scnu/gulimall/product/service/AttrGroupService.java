@@ -5,6 +5,7 @@ import com.scnu.common.utils.PageUtils;
 import com.scnu.gulimall.product.entity.AttrEntity;
 import com.scnu.gulimall.product.entity.AttrGroupEntity;
 import com.scnu.gulimall.product.vo.AttrGroupVo;
+import com.scnu.gulimall.product.vo.AttrGroupWithAttrsVo;
 
 import java.util.List;
 import java.util.Map;
@@ -38,5 +39,11 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      */
     void deleteRelation(AttrGroupVo[] attrGroupVos);
 
+    /**
+     * 获取分类下所有分组&关联属性
+     * @param catelogId
+     * @return
+     */
+    List<AttrGroupWithAttrsVo> attrGroupWithAttr(Long catelogId);
 }
 

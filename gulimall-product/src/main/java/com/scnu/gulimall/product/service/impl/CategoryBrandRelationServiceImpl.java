@@ -5,9 +5,15 @@ import com.scnu.gulimall.product.dao.BrandDao;
 import com.scnu.gulimall.product.dao.CategoryDao;
 import com.scnu.gulimall.product.entity.BrandEntity;
 import com.scnu.gulimall.product.entity.CategoryEntity;
+import com.scnu.gulimall.product.vo.BrandVo;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -49,6 +55,16 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         categoryBrandRelation.setBrandName(brandEntity.getName());
         categoryBrandRelation.setCatelogName(categoryEntity.getName());
         baseMapper.insert(categoryBrandRelation);
+    }
+
+    @Override
+    public List<BrandEntity> brandsListByCatId(Long catId) {
+        QueryWrapper<CategoryBrandRelationEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("catelog_id",catId).select("brand_id");
+        List<CategoryBrandRelationEntity> entities = baseMapper.selectList(wrapper);
+        List<Long> brandIds = entities.stream().map(item -> item.getBrandId()).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandDao.selectBatchIds(brandIds);
+        return brandEntities;
     }
 
 }

@@ -3,8 +3,11 @@ package com.scnu.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.scnu.gulimall.product.entity.BrandEntity;
+import com.scnu.gulimall.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,23 @@ import com.scnu.common.utils.R;
 public class CategoryBrandRelationController {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    /**
+     * /product/categorybrandrelation/brands/list
+     */
+    @GetMapping("/brands/list")
+    public R brandsList(@RequestParam(value = "catId",required = true) Long catId){
+        List<BrandEntity> brands = categoryBrandRelationService.brandsListByCatId(catId);
+
+        List<BrandVo> brandVos = brands.stream().map(item -> {
+            BrandVo vo = new BrandVo();
+            vo.setBrandId(item.getBrandId());
+            vo.setBrandName(item.getName());
+            return vo;
+        }).collect(Collectors.toList());
+
+        return R.ok().put("data",brandVos);
+    }
 
     /**
      * 列表
