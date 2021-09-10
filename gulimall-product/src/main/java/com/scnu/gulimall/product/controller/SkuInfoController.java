@@ -5,11 +5,7 @@ import java.util.Map;
 
 import com.scnu.gulimall.product.vo.SpuSaveVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scnu.gulimall.product.entity.SkuInfoEntity;
 import com.scnu.gulimall.product.service.SkuInfoService;
@@ -30,6 +26,15 @@ import com.scnu.common.utils.R;
 public class SkuInfoController {
     @Autowired
     private SkuInfoService skuInfoService;
+
+    /**
+     * 仅供远程调用使用
+     */
+    @GetMapping("/skuName/{skuId}")
+    public String getSkuName(@PathVariable("skuId") Long skuId){
+        SkuInfoEntity byId = skuInfoService.getById(skuId);
+        return byId.getSkuName();
+    }
 
     /**
      * 列表

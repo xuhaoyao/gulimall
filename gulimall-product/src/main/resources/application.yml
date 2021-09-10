@@ -5,6 +5,14 @@ spring:
     url: jdbc:mysql://182.92.2.51:3306/gulimall_pms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  thymeleaf:
+    cache: true
+
+  redis:
+    host: 192.168.200.130 #182.92.2.51
+    port: 6379
+
+
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
 
@@ -16,7 +24,7 @@ mybatis-plus:
 server:
   port: 10001
 
-logging:
-  level:
-    com.scnu.gulimall: debug
+#logging:
+#  level:
+#    com.scnu.gulimall: debug
 

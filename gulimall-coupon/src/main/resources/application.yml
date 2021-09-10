@@ -6,7 +6,7 @@
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #
 #mybatis-plus:
-#  mapper-locations: classpath:/mapper/product/*.xml
+#  mapper-locations: classpath:/mapper/coupon/*.xml
 #  global-config:
 #    db-config:
 #      id-type: auto  #主键自增

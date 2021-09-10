@@ -18,7 +18,8 @@ package com.scnu.common.exception;
 public enum ErrorCode {
 
     VALID_PARAMETER(10001,"参数格式校验失败"),
-    UNKNOWN_ERROR(10000,"系统未知异常");
+    UNKNOWN_ERROR(10000,"系统未知异常"),
+    PRODUCT_UP_ERROR(11000,"商品上架错误");
 
     private Integer code;
     private String msg;

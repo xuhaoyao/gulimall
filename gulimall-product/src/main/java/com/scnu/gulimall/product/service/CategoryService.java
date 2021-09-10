@@ -38,5 +38,16 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @param category
      */
     void updateDetail(CategoryEntity category);
+
+    /**
+     * 商场首页展示一级分类
+     * @return
+     */
+    List<CategoryEntity> getLevelOneList();
+
+    /**
+     * 商场首页展示的二级分类和三级分类,鼠标摸到一级分类展示相应内容
+     */
+    Map<String, Object> getcatalogJson();
 }
 
