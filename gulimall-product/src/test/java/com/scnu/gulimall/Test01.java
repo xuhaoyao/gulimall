@@ -3,9 +3,9 @@ package com.scnu.gulimall;
 import com.scnu.gulimall.product.service.CategoryService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,6 +22,9 @@ public class Test01 {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    @Autowired
+    private RedissonClient redisson;
+
     @Test
     public void test1(){
         Long[] catelogIdPath = categoryService.getCatelogIdPath(225L);
@@ -37,5 +40,10 @@ public class Test01 {
         ops.set("hello","world" + UUID.randomUUID().toString());
         String hello = ops.get("hello");
         System.out.println(hello);
+    }
+
+    @Test
+    public void testRedisson(){
+        System.out.println(redisson);
     }
 }

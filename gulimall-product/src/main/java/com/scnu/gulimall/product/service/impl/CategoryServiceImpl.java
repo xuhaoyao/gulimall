@@ -4,9 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.scnu.common.utils.Query;
 import com.scnu.gulimall.product.constant.RedisConstant;
+import com.scnu.gulimall.product.constant.RedissonConstant;
 import com.scnu.gulimall.product.dao.CategoryBrandRelationDao;
 import com.scnu.gulimall.product.vo.Catalog2Vo;
 import javafx.collections.MapChangeListener;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -36,6 +39,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedissonClient redisson;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -174,7 +180,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         Map<String, Object> catalog = null;
         if(StringUtils.isEmpty(catalogJson)){
             System.out.println("缓存不命中...查询数据库");
-            catalog = this.getcatalogJsonWithRedisLock(); //this.getcatalogJsonSynchronized();
+            catalog = this.getcatalogJsonWithRedissonLock(); //this.getcatalogJsonWithRedisLock(); //this.getcatalogJsonSynchronized();
             return catalog;
         }
         catalog = JSON.parseObject(catalogJson,new TypeReference<Map<String, Object>>(){});
@@ -184,7 +190,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     /**
+     * Redisson分布式锁
+     * 阻塞式等待
+     */
+    public Map<String,Object> getcatalogJsonWithRedissonLock(){
+        RLock lock = redisson.getLock(RedissonConstant.CATALOGLOCK);
+        Map<String,Object> result;
+        try {
+            lock.lock(30L,TimeUnit.SECONDS);
+            result = this.getcatalogJsonSynchronized();
+        }finally {
+            lock.unlock();
+        }
+        return result;
+    }
+
+    /**
      * Redis分布式锁
+     * 自旋式等待
      */
     public Map<String,Object> getcatalogJsonWithRedisLock(){
         String uuid = UUID.randomUUID().toString();
