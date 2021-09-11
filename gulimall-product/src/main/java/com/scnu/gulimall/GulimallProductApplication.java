@@ -2,6 +2,7 @@ package com.scnu.gulimall;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -73,6 +74,45 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *             <version>3.12.0</version>
  *         </dependency>
  *  2.配置redisson
+ *  3.https://github.com/redisson/redisson/wiki
+ *
+ *  8.整合SpringCache简化缓存开发
+ *   1)、引入依赖
+ *          spring-boot-starter-cache,spring-boot-starter-data-redis
+ *   2）、配置
+ *          1)自动配置了什么
+ *              CacheAutoConfiguration会导入RedisCacheConfiguration
+ *              自动配好了RedisCacheManager缓存管理器
+ *          2)配置使用redis作为缓存
+ *              spring.cache.type=redis
+ *   3)注解
+ *   首先在启动类上添加注解@EnableCaching
+ *      @Cacheable: Triggers cache population.
+ *      @CacheEvict: Triggers cache eviction.
+ *      @CachePut: Updates the cache without interfering with the method execution.
+ *      @Caching: Regroups multiple cache operations to be applied on a method.
+ *      @CacheConfig: Shares some common cache-related settings at class-level.
+ *
+ *   4)原理
+ *      CacheAutoConfiguration会导入RedisCacheConfiguration
+ *      -> 自动配好了RedisCacheManager缓存管理器
+ *      -> 如果redisCacheConfiguration没有配,就用默认的,否则使用我们自己配的
+ *      -> 想要改缓存的配置,只需要我们注入一个redisCacheConfiguration即可
+ *      -> 就会应用到当前redisCacheConfiguration管理的所有缓存分区
+ *
+ *   5)不足之处:
+ *     1)读模式:
+ *          缓存穿透:查询一个不存在的数据,缓存中没有,一直查数据库
+ *              解决:缓存空数据,spring.cache.redis.cache-null-values=true(默认)
+ *          缓存击穿:大量并发进来同时查询一个正好过期的数据
+ *              解决:加锁(sync=true),虽然不是分布式锁,但一台机器只查一次数据库,也还行??
+ *          缓存雪崩:大量的key同时过期
+ *              解决:加上过期时间,spring.cache.redis.time-to-live=xxx(毫秒)
+ *     2)写模式(缓存与数据库一致)
+ *          1.读写加锁(读多写少的系统)
+ *          2.引入Canal,感知MySQL的更新去更新redis
+ *          3.读多写多,直接去数据库查询就行
+ *
  */
 
 @SpringBootApplication

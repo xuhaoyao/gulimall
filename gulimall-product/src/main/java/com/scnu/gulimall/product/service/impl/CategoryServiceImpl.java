@@ -11,6 +11,9 @@ import javafx.collections.MapChangeListener;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -84,6 +87,18 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return list.toArray(new Long[0]);
     }
 
+    /**
+     * 级联更新所有关联数据
+     * @CacheEvict:失效模式
+     * @CachePut:双写模式 -> 此处使用不了,因为返回值是void
+     * 1.同时进行多种缓存操作,用@Caching
+     * 2.指定删除某个分区下的所有数据  @CacheEvict(cacheNames = {"category"},allEntries = true)
+     * 3.为了更新方法,存储的同一种类型数据,都应该指定相同分区
+     */
+    @Caching(evict = {
+            @CacheEvict(cacheNames = {"category"},key = "'getLevelOneList'"),
+            @CacheEvict(cacheNames = {"category"},key = "'getcatalogJson'")
+    })
     @Transactional
     @Override
     public void updateDetail(CategoryEntity category) {
@@ -93,8 +108,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         baseMapper.updateById(category);
     }
 
+    /**
+     *  1.每一个需要缓存的数据我们都来指定要放在哪个名字的缓存中【缓存的分区(按照业务类型分)】
+     *  2.@Cacheable代表当前方法的结果需要缓存,如果缓存中有,方法就不需要调用,直接从缓存中返回
+     *  3.默认行为
+     *      1)如果缓存中有,方法不用调用
+     *      2)key默认自动生成 -> 缓存的名字:SimpleKey []
+     *      3)缓存的value值.默认使用jdk序列化机制,将序列化后的数据存到redis
+     *      4)默认时间 ttl=-1
+     *
+     *  4.自定义:
+     *      1)指定生成的缓存使用的Key   key属性指定,接受SpEL
+     *          SpEl -> https://docs.spring.io/spring-framework/docs/current/reference/html/integration.html#spring-integration
+     *      2)指定缓存的数据的存活时间   配置文件修改ttl
+     *      3)将数据保存为json格式
+     *  sync=true,防止缓存击穿
+     */
+    @Cacheable(cacheNames = {"category"},key = "#root.method.name",sync = true)
     @Override
     public List<CategoryEntity> getLevelOneList() {
+        System.out.println("未使用缓存...查数据库");
         List<CategoryEntity> categoryEntities = this.getLevelListWithCondition(0L,1);
         return categoryEntities;
     }
@@ -144,6 +177,36 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return collect;
     }*/
 
+    @Cacheable(cacheNames = "category",key = "#root.methodName",sync = true)
+    @Override
+    public Map<String, Object> getcatalogJson(){
+        Long start = System.currentTimeMillis();
+        //1.查所有数据
+        List<CategoryEntity> allList = baseMapper.selectList(null);
+        List<CategoryEntity> levelOneList = this.getLevelListWithCondition(allList,0L,1);
+        Map<String, Object> collect = levelOneList.stream().collect(Collectors.toMap(key -> key.getCatId().toString(), levelOne -> {
+            //查这个一级分类对应的所有二级分类
+            List<CategoryEntity> levelTwoList = this.getLevelListWithCondition(allList,levelOne.getCatId(), levelOne.getCatLevel() + 1);
+            //封装成对应的vo2
+            List<Catalog2Vo> catalog2Vos = levelTwoList.stream().map(levelTwo -> {
+                Catalog2Vo catalog2Vo = new Catalog2Vo(levelOne.getCatId().toString(), null, levelTwo.getCatId().toString(), levelTwo.getName());
+                //查这个二级分类对应的所有三级分类
+                List<CategoryEntity> levelThreeList = this.getLevelListWithCondition(allList,levelTwo.getCatId(), levelTwo.getCatLevel() + 1);
+                //封装成对应的vo3
+                List<Catalog2Vo.Catalog3Vo> catalog3List = levelThreeList.stream().map(levelThree -> {
+                    Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo(levelTwo.getCatId().toString(), levelThree.getCatId().toString(), levelThree.getName());
+                    return catalog3Vo;
+                }).collect(Collectors.toList());
+                catalog2Vo.setCatalog3List(catalog3List);
+                return catalog2Vo;
+            }).collect(Collectors.toList());
+            return catalog2Vos;
+        }));
+        Long end = System.currentTimeMillis();
+        System.out.println("数据库查询分类耗时:" + (end - start) + "ms");
+        return collect;
+    }
+
     /**
      * 虚拟机下redis
      * io.netty.util.internal.OutOfDirectMemoryError:
@@ -165,8 +228,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * 云服务器由于带宽的限制,演示不出这个效果
      */
-    @Override
-    public Map<String, Object> getcatalogJson(){
+    public Map<String, Object> getcatalogJson_old(){
 
         /**
          * 1.空结果缓存,解决缓存穿透
