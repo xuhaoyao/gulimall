@@ -39,10 +39,16 @@ spring:
             - RewritePath=/api/?(?<segment>.*), /renren-fast/$\{segment}
           #http://localhost:88/api/captcha.jpg -> http://localhost:88/renren-fast/captcha.jpg
 
-        - id: host_route
+        - id: host_search_route
+          uri: lb://gulimall-search
+          predicates:
+            - Host=search.gulimall.com
+
+        - id: host_index_route
           uri: lb://gulimall-product
           predicates:
             - Host=gulimall.com
+
 
 server:
   port: 88

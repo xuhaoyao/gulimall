@@ -1,3 +1,11 @@
 spring:
   profiles:
     active: dev
+
+  thymeleaf:
+    cache: false
+
+#用于服务降级,使得注解@FeignClient中添加fallback后起作用
+feign:
+  hystrix:
+    enabled: true

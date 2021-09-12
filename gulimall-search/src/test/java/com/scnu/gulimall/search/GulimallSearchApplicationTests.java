@@ -27,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -114,6 +115,11 @@ public class GulimallSearchApplicationTests {
                 .source(JSON.toJSONString(user), XContentType.JSON);
         IndexResponse indexResponse = client.index(request, ElasticSearchConfig.COMMON_OPTIONS);
         System.out.println(indexResponse);
+    }
+
+    @Test
+    public void test00(){
+        System.out.println(Arrays.toString("_500".split("_")));
     }
 
 }

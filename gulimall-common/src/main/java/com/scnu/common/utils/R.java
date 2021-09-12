@@ -1,5 +1,8 @@
 package com.scnu.common.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +15,13 @@ import java.util.Map;
  */
 public class R extends HashMap<String, Object> {
 	private static final long serialVersionUID = 1L;
+
+	//利用fastjson进行逆转
+	public <T> T getData(String key,TypeReference<T> typeReference){
+		Object data = this.get(key);  //远程调用返回后,放在map里面的对象默认变成了linkedHashMap
+		String json = JSON.toJSONString(data);
+		return JSON.parseObject(json,typeReference);
+	}
 	
 	public R() {
 		put("code", 0);

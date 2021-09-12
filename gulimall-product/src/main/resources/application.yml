@@ -6,7 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   thymeleaf:
-    cache: true
+    cache: false
 
   redis:
     host: 182.92.2.51 #192.168.200.130
@@ -29,7 +29,13 @@ mybatis-plus:
 server:
   port: 10001
 
+
+
 #logging:
 #  level:
 #    com.scnu.gulimall: debug
 
+#远程调用失败后,服务降级
+feign:
+  hystrix:
+    enabled: true
