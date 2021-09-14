@@ -8,6 +8,8 @@ import com.scnu.gulimall.product.entity.AttrEntity;
 import com.scnu.gulimall.product.service.AttrService;
 import com.scnu.gulimall.product.vo.AttrGroupVo;
 import com.scnu.gulimall.product.vo.AttrGroupWithAttrsVo;
+import com.scnu.gulimall.product.vo.SkuItemVo;
+import com.scnu.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.apache.commons.lang.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +116,12 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
             return vo;
         }).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public List<SpuItemAttrGroupVo> spuInfo(Long spuId, Long catalogId) {
+        List<SpuItemAttrGroupVo> vos = baseMapper.spuInfo(spuId,catalogId);
+        return vos;
     }
 
 

@@ -6,6 +6,8 @@ import com.scnu.gulimall.product.entity.AttrEntity;
 import com.scnu.gulimall.product.entity.AttrGroupEntity;
 import com.scnu.gulimall.product.vo.AttrGroupVo;
 import com.scnu.gulimall.product.vo.AttrGroupWithAttrsVo;
+import com.scnu.gulimall.product.vo.SkuItemVo;
+import com.scnu.gulimall.product.vo.SpuItemAttrGroupVo;
 
 import java.util.List;
 import java.util.Map;
@@ -45,5 +47,13 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @return
      */
     List<AttrGroupWithAttrsVo> attrGroupWithAttr(Long catelogId);
+
+    /**
+     * 查出当前spu对应的所有属性的分组名字以及分组下所有属性名和属性值
+     * @param spuId
+     * @param catalogId
+     * @return
+     */
+    List<SpuItemAttrGroupVo> spuInfo(Long spuId, Long catalogId);
 }
 

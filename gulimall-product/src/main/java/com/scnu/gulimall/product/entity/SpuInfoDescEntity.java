@@ -26,7 +26,7 @@ public class SpuInfoDescEntity implements Serializable {
 	@TableId(type = IdType.INPUT)
 	private Long spuId;  //此处的spuId需要我们手动输入,若不设置的话,mp认为是自增的,插入数据库的时候不带id字段,而数据库设计的时候spuId不自增,因此会报错
 	/**
-	 * 商品介绍
+	 * 商品介绍->即图片集
 	 */
 	private String decript;
 

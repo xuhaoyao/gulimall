@@ -44,10 +44,10 @@ spring:
           predicates:
             - Host=search.gulimall.com
 
-        - id: host_index_route
+        - id: host_product_route
           uri: lb://gulimall-product
           predicates:
-            - Host=gulimall.com
+            - Host=gulimall.com,item.gulimall.com
 
 
 server:

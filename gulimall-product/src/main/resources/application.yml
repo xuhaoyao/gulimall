@@ -29,8 +29,6 @@ mybatis-plus:
 server:
   port: 10001
 
-
-
 #logging:
 #  level:
 #    com.scnu.gulimall: debug
@@ -39,3 +37,12 @@ server:
 feign:
   hystrix:
     enabled: true
+
+#自定义线程池配置
+gulimall:
+  pool:
+    core-pool-size: 5
+    maximum-pool-size: 20
+    keep-alive-time: 10
+    queue-size: 10000
+

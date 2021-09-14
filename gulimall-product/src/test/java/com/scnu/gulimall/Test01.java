@@ -1,6 +1,11 @@
 package com.scnu.gulimall;
 
+import com.scnu.gulimall.product.dao.AttrGroupDao;
 import com.scnu.gulimall.product.service.CategoryService;
+import com.scnu.gulimall.product.service.SkuSaleAttrValueService;
+import com.scnu.gulimall.product.vo.SkuItemSaleAttrVo;
+import com.scnu.gulimall.product.vo.SkuItemVo;
+import com.scnu.gulimall.product.vo.SpuItemAttrGroupVo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RedissonClient;
@@ -10,6 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -24,6 +30,18 @@ public class Test01 {
 
     @Autowired
     private RedissonClient redisson;
+
+    @Autowired
+    private AttrGroupDao attrGroupDao;
+
+    @Autowired
+    private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Test
+    public void testDao(){
+        List<SkuItemSaleAttrVo> saleAttrsBySkuId = skuSaleAttrValueService.getSaleAttrsBySpuId(2L);
+        System.out.println(saleAttrsBySkuId);
+    }
 
     @Test
     public void test1(){
