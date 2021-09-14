@@ -1,0 +1,9 @@
+server:
+  port: 20000
+
+spring:
+  thymeleaf:
+    cache: false
+  redis:
+    host: 182.92.2.51
+    port: 6379

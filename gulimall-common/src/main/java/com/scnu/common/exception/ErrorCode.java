@@ -8,6 +8,7 @@ package com.scnu.common.exception;
  * 错误码列表：
  * 10: 通用
  *    001：参数格式校验
+ *    002: 邮箱验证码发送频繁,请1分钟后再试
  * 11: 商品
  * 12: 订单
  * 13: 购物车
@@ -19,7 +20,8 @@ public enum ErrorCode {
 
     VALID_PARAMETER(10001,"参数格式校验失败"),
     UNKNOWN_ERROR(10000,"系统未知异常"),
-    PRODUCT_UP_ERROR(11000,"商品上架错误");
+    PRODUCT_UP_ERROR(11000,"商品上架错误"),
+    EMAIL_ERROR(10002,"邮箱验证码发送频繁,请1分钟后再试");
 
     private Integer code;
     private String msg;

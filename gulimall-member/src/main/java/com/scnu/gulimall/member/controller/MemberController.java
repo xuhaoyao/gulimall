@@ -3,7 +3,11 @@ package com.scnu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.scnu.gulimall.member.exception.EmailException;
+import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.feign.CouponFeignService;
+import com.scnu.gulimall.member.to.UserLoginTo;
+import com.scnu.gulimall.member.to.UserRegisterTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +16,7 @@ import com.scnu.gulimall.member.service.MemberService;
 import com.scnu.common.utils.PageUtils;
 import com.scnu.common.utils.R;
 
+import javax.security.auth.login.LoginException;
 
 
 /**
@@ -29,6 +34,30 @@ public class MemberController {
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @PostMapping("/login")
+    public R login(@RequestBody UserLoginTo to){
+
+        try {
+            memberService.login(to);
+        } catch (LoginException e) {
+            return R.error().put("msg",e.getMessage());
+        }
+
+        return R.ok();
+    }
+
+    @PostMapping("/register")
+    public R register(@RequestBody UserRegisterTo to){
+        try {
+            memberService.register(to);
+        } catch (EmailException e) {
+            return R.error().put("msg",e.getMessage());
+        } catch (UserNameException e) {
+            return R.error().put("msg",e.getMessage());
+        }
+        return R.ok();
+    }
 
     /**
      * 测试远程调用

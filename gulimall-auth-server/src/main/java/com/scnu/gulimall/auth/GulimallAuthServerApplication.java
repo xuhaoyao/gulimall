@@ -1,17 +1,17 @@
-package com.scnu.gulimall;
+package com.scnu.gulimall.auth;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@SpringBootApplication
 @EnableDiscoveryClient
-@EnableAsync
-public class GulimallThirdPartyApplication {
+@EnableFeignClients
+@SpringBootApplication
+public class GulimallAuthServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GulimallThirdPartyApplication.class, args);
+        SpringApplication.run(GulimallAuthServerApplication.class, args);
     }
 
 }
