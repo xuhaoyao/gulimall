@@ -5,8 +5,10 @@ import com.scnu.gulimall.member.entity.MemberLevelEntity;
 import com.scnu.gulimall.member.exception.EmailException;
 import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.service.MemberLevelService;
+import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
+import com.scnu.gulimall.member.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,11 +64,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         member.setUsername(to.getUserName());
         member.setPassword(new BCryptPasswordEncoder().encode(to.getPassword()));
         member.setEmail(to.getEmail());
+        member.setNickname(to.getUserName());
         baseMapper.insert(member);
     }
 
     @Override
-    public void login(UserLoginTo to) throws LoginException {
+    public UserInfoVo login(UserLoginTo to) throws LoginException {
         QueryWrapper<MemberEntity> wrapper = new QueryWrapper<MemberEntity>()
                 .eq("username", to.getAccount())
                 .or()
@@ -81,6 +84,26 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         if(!matches){
             throw new LoginException("密码错误!");
         }
+        return new UserInfoVo().setNickName(memberEntity.getNickname());
+    }
+
+    @Override
+    public UserInfoVo giteeLogin(GiteeTo to) {
+        MemberEntity memberEntity = baseMapper.selectOne(new QueryWrapper<MemberEntity>().eq("gitee_id", to.getGiteeId()));
+        if(memberEntity == null){
+            memberEntity = new MemberEntity();
+            memberEntity.setGiteeId(to.getGiteeId());
+            memberEntity.setGiteeName(to.getGiteeName());
+            memberEntity.setNickname(to.getGiteeName());
+            baseMapper.insert(memberEntity);
+        }else{
+            //信息有变化,更新
+            if(!to.getGiteeName().equals(memberEntity.getGiteeName())){
+                memberEntity.setGiteeName(to.getGiteeName());
+                baseMapper.updateById(memberEntity);
+            }
+        }
+        return new UserInfoVo().setNickName(to.getGiteeName());
     }
 
 }

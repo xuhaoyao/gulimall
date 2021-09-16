@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,9 +33,10 @@ public class IndexController {
     private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping({"/","/index.html"})
-    public String indexPage(Model model){
+    public String indexPage(Model model, HttpSession session){
         List<CategoryEntity> categoryEntities = categoryService.getLevelOneList();
         model.addAttribute("categories",categoryEntities);
+        System.out.println("--->" + session.getAttribute("user"));
         return "index";
     }
 

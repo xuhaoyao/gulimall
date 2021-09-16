@@ -7,3 +7,10 @@ spring:
   redis:
     host: 182.92.2.51
     port: 6379
+    password: aa6631656
+
+  session:
+    store-type: redis  #SpringSession配合redis解决分布式下session问题
+
+  profiles:
+    active: dev  #oauth密钥

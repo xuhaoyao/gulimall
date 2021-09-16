@@ -1,10 +1,13 @@
 package com.scnu.gulimall.auth.controller;
 
+import com.alibaba.fastjson.TypeReference;
 import com.scnu.common.exception.ErrorCode;
 import com.scnu.common.utils.R;
+import com.scnu.gulimall.auth.constant.AuthConstant;
 import com.scnu.gulimall.auth.constant.RedisConstant;
 import com.scnu.gulimall.auth.feign.MemberFeignService;
 import com.scnu.gulimall.auth.feign.ThirdPartyFeignService;
+import com.scnu.gulimall.auth.vo.UserInfoVo;
 import com.scnu.gulimall.auth.vo.UserLoginVo;
 import com.scnu.gulimall.auth.vo.UserRegisterVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +18,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -138,13 +143,15 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(UserLoginVo vo,RedirectAttributes attributes){
+    public String login(UserLoginVo vo, RedirectAttributes attributes, HttpSession session){
 
         R login = memberFeignService.login(vo);
         if(login.getCode() != 0){
             attributes.addFlashAttribute("msg",login.get("msg"));
             return "redirect:http://auth.gulimall.com/login.html";
         }
+        UserInfoVo data = login.getData("data", new TypeReference<UserInfoVo>(){});
+        session.setAttribute(AuthConstant.SESSION_USER_NAME,data);
         return "redirect:http://gulimall.com";
     }
 

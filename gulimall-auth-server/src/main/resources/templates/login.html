@@ -10,7 +10,7 @@
 		<!--顶部logo-->
 		<header>
 			<a href="http://gulimall.com"><img src="static/login/JD_img/logo.jpg" /></a>
-			<p>欢迎登录</p>
+			<p>欢迎登录[[${session.user == null ? 'xxx' : session.user.nickname}]]</p>
 			<div class="top-1">
 				<img src="static/login/JD_img/4de5019d2404d347897dee637895d02b_06.png" /><span>登录页面,调查问卷</span>
 			</div>
@@ -78,16 +78,14 @@
 				<div class="si_out">
 					<ul>
 						<li>
-							<a href="static/login/#">
-								<img src="static/login/JD_img/qq.png" />
-								<span>QQ</span>
+							<a href="https://gitee.com/oauth/authorize?client_id=ff3b8b9dba7113dc104e0968b8c73b7913f01a155f16632100aa17b5235bbd14&redirect_uri=http://auth.gulimall.com/oauth2/gitee/success&response_type=code">
+								<img src="static/login/JD_img/weibo.png" />
 							</a>
 						</li>
 						<li class="f4"> | </li>
 						<li>
 							<a href="static/login/">
 								<img src="static/login/JD_img/weixin.png" />
-								<span>微信</span>
 							</a>
 						</li>
 					</ul>

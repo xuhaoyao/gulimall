@@ -1,6 +1,7 @@
 package com.scnu.gulimall.auth.feign;
 
 import com.scnu.common.utils.R;
+import com.scnu.gulimall.auth.to.GiteeTo;
 import com.scnu.gulimall.auth.vo.UserLoginVo;
 import com.scnu.gulimall.auth.vo.UserRegisterVo;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -15,5 +16,8 @@ public interface MemberFeignService {
 
     @PostMapping("/member/member/login")
     R login(@RequestBody UserLoginVo vo);
+
+    @PostMapping("/member/member/gitee/login")
+    R giteeLogin(@RequestBody GiteeTo to);
 
 }

@@ -6,8 +6,10 @@ import java.util.Map;
 import com.scnu.gulimall.member.exception.EmailException;
 import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.feign.CouponFeignService;
+import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
+import com.scnu.gulimall.member.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,16 +37,22 @@ public class MemberController {
     @Autowired
     private CouponFeignService couponFeignService;
 
+    @PostMapping("/gitee/login")
+    public R giteeLogin(@RequestBody GiteeTo to){
+        UserInfoVo userInfoVo = memberService.giteeLogin(to);
+        return R.ok().put("data",userInfoVo);
+    }
+
     @PostMapping("/login")
     public R login(@RequestBody UserLoginTo to){
 
         try {
-            memberService.login(to);
+            UserInfoVo vo = memberService.login(to);
+            return R.ok().put("data",vo);
         } catch (LoginException e) {
             return R.error().put("msg",e.getMessage());
         }
 
-        return R.ok();
     }
 
     @PostMapping("/register")
