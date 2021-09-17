@@ -2,13 +2,13 @@ package com.scnu.gulimall.member.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.scnu.common.utils.PageUtils;
+import com.scnu.common.vo.UserInfoVo;
 import com.scnu.gulimall.member.entity.MemberEntity;
 import com.scnu.gulimall.member.exception.EmailException;
 import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
-import com.scnu.gulimall.member.vo.UserInfoVo;
 
 import javax.security.auth.login.LoginException;
 import java.util.Map;

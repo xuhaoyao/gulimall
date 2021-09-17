@@ -3,13 +3,13 @@ package com.scnu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.scnu.common.vo.UserInfoVo;
 import com.scnu.gulimall.member.exception.EmailException;
 import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.feign.CouponFeignService;
 import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
-import com.scnu.gulimall.member.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

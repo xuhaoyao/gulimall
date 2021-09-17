@@ -20,6 +20,7 @@ public class helloController {
         String token = request.getParameter("token");
         HttpSession session = request.getSession();
         if(StringUtils.hasLength(token)){
+            //TODO 此处应该拿着Token请求认证中心,得到用户信息
             String s = redisTemplate.opsForValue().get(token);
             session.setAttribute("user",s);
             return "list";

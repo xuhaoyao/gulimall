@@ -5,6 +5,21 @@ spring:
     url: jdbc:mysql://182.92.2.51:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  rabbitmq:
+    host: 182.92.2.51
+    port: 5672
+    username: guest
+    password: rencai666..
+    virtual-host: /
+    publisher-confirms: true #开启发送端消息抵达broker确认
+    publisher-returns: true  #发送端消息抵达队列确认
+    template:
+      mandatory: true  #只要消息没有抵达队列,优先以异步方式回调returnConfirm
+    listener:
+      simple:
+        acknowledge-mode: manual #手动ack
+
+
 mybatis-plus:
   mapper-locations: classpath:/mapper/order/*.xml
   global-config:

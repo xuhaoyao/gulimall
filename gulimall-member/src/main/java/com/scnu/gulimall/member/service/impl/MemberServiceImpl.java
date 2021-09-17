@@ -1,5 +1,6 @@
 package com.scnu.gulimall.member.service.impl;
 
+import com.scnu.common.vo.UserInfoVo;
 import com.scnu.gulimall.member.dao.MemberLevelDao;
 import com.scnu.gulimall.member.entity.MemberLevelEntity;
 import com.scnu.gulimall.member.exception.EmailException;
@@ -8,7 +9,6 @@ import com.scnu.gulimall.member.service.MemberLevelService;
 import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
-import com.scnu.gulimall.member.vo.UserInfoVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -84,7 +84,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         if(!matches){
             throw new LoginException("密码错误!");
         }
-        return new UserInfoVo().setNickName(memberEntity.getNickname());
+        return new UserInfoVo().setNickName(memberEntity.getNickname()).setId(memberEntity.getId());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
                 baseMapper.updateById(memberEntity);
             }
         }
-        return new UserInfoVo().setNickName(to.getGiteeName());
+        return new UserInfoVo().setNickName(to.getGiteeName()).setId(memberEntity.getId());
     }
 
 }

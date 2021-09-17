@@ -1,14 +1,11 @@
 package com.scnu.gulimall.product.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scnu.gulimall.product.entity.SkuSaleAttrValueEntity;
 import com.scnu.gulimall.product.service.SkuSaleAttrValueService;
@@ -29,6 +26,16 @@ import com.scnu.common.utils.R;
 public class SkuSaleAttrValueController {
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    /**
+     * 远程调用接口->查到此sku对应的销售属性组合
+     * @param skuId
+     * @return
+     */
+    @GetMapping("/saleAttrs/{skuId}")
+    public List<String> saleAttrs(@PathVariable("skuId") Long skuId){
+        return skuSaleAttrValueService.saleAttrs(skuId);
+    }
 
     /**
      * 列表
