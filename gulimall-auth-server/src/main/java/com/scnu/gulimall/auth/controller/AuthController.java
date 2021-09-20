@@ -1,10 +1,10 @@
 package com.scnu.gulimall.auth.controller;
 
 import com.alibaba.fastjson.TypeReference;
+import com.scnu.common.constant.auth.AuthConstant;
 import com.scnu.common.exception.ErrorCode;
 import com.scnu.common.utils.R;
 import com.scnu.common.vo.UserInfoVo;
-import com.scnu.gulimall.auth.constant.AuthConstant;
 import com.scnu.gulimall.auth.constant.RedisConstant;
 import com.scnu.gulimall.auth.feign.MemberFeignService;
 import com.scnu.gulimall.auth.feign.ThirdPartyFeignService;

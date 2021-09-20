@@ -3,12 +3,9 @@ package com.scnu.gulimall.ware.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.scnu.gulimall.ware.vo.AddressFeeVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scnu.gulimall.ware.entity.WareInfoEntity;
 import com.scnu.gulimall.ware.service.WareInfoService;
@@ -29,6 +26,12 @@ import com.scnu.common.utils.R;
 public class WareInfoController {
     @Autowired
     private WareInfoService wareInfoService;
+
+    @GetMapping("/addressFee/{addrId}")
+    public R addressFee(@PathVariable("addrId") Long addrId){
+        AddressFeeVo vo = wareInfoService.addressFee(addrId);
+        return R.ok().put("data",vo);
+    }
 
     /**
      * 列表

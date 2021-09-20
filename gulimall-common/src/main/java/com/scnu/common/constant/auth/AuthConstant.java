@@ -1,4 +1,4 @@
-package com.scnu.gulimall.auth.constant;
+package com.scnu.common.constant.auth;
 
 public interface AuthConstant {
 

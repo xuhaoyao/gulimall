@@ -15,3 +15,8 @@
 spring:
   profiles:
     active: dev
+
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: fsp_tx_group

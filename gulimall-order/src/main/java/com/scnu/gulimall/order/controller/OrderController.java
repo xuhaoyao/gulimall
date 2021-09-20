@@ -1,14 +1,15 @@
 package com.scnu.gulimall.order.controller;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
+import com.scnu.gulimall.order.entity.OrderReturnApplyEntity;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scnu.gulimall.order.entity.OrderEntity;
 import com.scnu.gulimall.order.service.OrderService;
@@ -29,6 +30,30 @@ import com.scnu.common.utils.R;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @GetMapping("/sendMsg/{num}")
+    public String sendMsg(@PathVariable("num") Integer num){
+
+        for (Integer i = 0; i < num; i++) {
+            if(i % 2 == 0){
+                OrderEntity orderEntity = new OrderEntity();
+                orderEntity.setBillContent("222");
+                orderEntity.setOrderSn("dsdsd");
+                orderEntity.setCommentTime(new Date());
+                rabbitTemplate.convertAndSend("hello.java.exchange","java.key1",orderEntity,new CorrelationData("" + i));
+            }
+            else{
+                OrderReturnApplyEntity returnApplyEntity = new OrderReturnApplyEntity();
+                returnApplyEntity.setOrderSn(UUID.randomUUID().toString());
+                rabbitTemplate.convertAndSend("hello.java.exchange","java.key",returnApplyEntity,new CorrelationData("" + i));
+            }
+        }
+
+        return "ok";
+    }
 
     /**
      * 列表

@@ -132,6 +132,29 @@ public class CartServiceImpl implements CartService {
         redisCart.delete(skuId.toString());
     }
 
+    @Override
+    public List<CartItemVo> userCartItemsInfo() {
+        UserInfoTo userInfoTo = CartInterceptor.threadLocal.get();
+        Long userId = userInfoTo.getUserId();
+        if(userId == null) {
+            return null;
+        }
+        else{
+            String cartKey = CartConstant.CART_PREFIX + userId;
+            List<CartItemVo> cartItems = getCartItemsByCaryKey(cartKey);
+            List<CartItemVo> collect = cartItems.stream()
+                    .filter(CartItemVo::getCheck)
+                    .map(item -> {
+                        //TODO 取得此项物品的最新价格
+                        R r = productFeignService.getSkuInfo(item.getSkuId());
+                        SkuInfoTo skuInfo = r.getData("skuInfo", new TypeReference<SkuInfoTo>(){});
+                        item.setPrice(skuInfo.getPrice());
+                        return item;
+                    }).collect(Collectors.toList());
+            return collect;
+        }
+    }
+
     /**
      * 给购物车新增一个购物项
      * @param skuId   商品id

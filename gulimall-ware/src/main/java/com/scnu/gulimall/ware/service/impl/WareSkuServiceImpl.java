@@ -2,7 +2,12 @@ package com.scnu.gulimall.ware.service.impl;
 
 import com.scnu.common.to.SkuHasStockTo;
 import com.scnu.common.utils.R;
+import com.scnu.gulimall.ware.exception.NoStockException;
 import com.scnu.gulimall.ware.feign.ProductFeignService;
+import com.scnu.gulimall.ware.vo.LockStockResult;
+import com.scnu.gulimall.ware.vo.OrderItemVo;
+import com.scnu.gulimall.ware.vo.WareSkuLockVo;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +80,21 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
             return to;
         }).collect(Collectors.toList());
         return collect;
+    }
+
+    @Transactional
+    @Override
+    public void orderLockStock(WareSkuLockVo vo) throws NoStockException {
+
+        //找到每个商品在哪个仓库都有库存[一般是找附近的仓库,按照距离降序排列]
+        List<OrderItemVo> locks = vo.getLocks();
+        locks.forEach(item -> {
+            Long wareId = baseMapper.selectWareIdHasStockBySkuId(item.getSkuId(),item.getCount());
+            if(wareId == null){
+                throw new NoStockException(item.getSkuId());
+            }
+            baseMapper.updateStockLock(item.getSkuId(),wareId,item.getCount());
+        });
     }
 
 }

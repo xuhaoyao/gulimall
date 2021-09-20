@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.scnu.common.to.SkuHasStockTo;
+import com.scnu.gulimall.ware.exception.NoStockException;
+import com.scnu.gulimall.ware.vo.LockStockResult;
+import com.scnu.gulimall.ware.vo.WareSkuLockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +30,22 @@ import com.scnu.common.utils.R;
 public class WareSkuController {
     @Autowired
     private WareSkuService wareSkuService;
+
+    /**
+     * 订单服务远程调用此方法,锁定库存
+     * @param vo
+     * @return
+     */
+    @PostMapping("/lock/order")
+    public R orderLockStock(@RequestBody WareSkuLockVo vo){
+        try {
+            wareSkuService.orderLockStock(vo);
+            return R.ok();
+        } catch (NoStockException e) {
+            e.printStackTrace();
+            return R.error().put("msg",e.getMessage());
+        }
+    }
 
     /**
      * 远程调用,查询是否有库存

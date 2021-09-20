@@ -3,6 +3,9 @@ package com.scnu.gulimall.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.scnu.common.utils.PageUtils;
 import com.scnu.gulimall.order.entity.OrderEntity;
+import com.scnu.gulimall.order.vo.OrderConfirmVo;
+import com.scnu.gulimall.order.vo.OrderFormVo;
+import com.scnu.gulimall.order.vo.SubmitOrderRespVo;
 
 import java.util.Map;
 
@@ -16,5 +19,18 @@ import java.util.Map;
 public interface OrderService extends IService<OrderEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取订单确认页的数据
+     * @return
+     */
+    OrderConfirmVo confirmOrder();
+
+    /**
+     * 提交表单
+     * @param orderFormVo
+     * @return
+     */
+    SubmitOrderRespVo submitOrder(OrderFormVo orderFormVo);
 }
 

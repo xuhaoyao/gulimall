@@ -57,7 +57,10 @@ public class CartVo {
     public BigDecimal getTotalAmount() {
         BigDecimal totalAmount = new BigDecimal("0");
         if(!ObjectUtils.isEmpty(items)){
-            totalAmount = items.stream().map(CartItemVo::getTotalPrice).reduce(BigDecimal.ZERO,BigDecimal::add);
+            totalAmount = items.stream()
+                    .filter(CartItemVo::getCheck)
+                    .map(CartItemVo::getTotalPrice)
+                    .reduce(BigDecimal.ZERO,BigDecimal::add);
         }
         //还要减去优惠价格,这里优惠价格不处理
         return totalAmount.subtract(getReduce());

@@ -11,14 +11,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class CartController {
 
     @Autowired
     private CartService cartService;
+
+    @ResponseBody
+    @GetMapping("/userCartItemsInfo")
+    public List<CartItemVo> userCartItemsInfo(){
+        return cartService.userCartItemsInfo();
+    }
 
     /**
      * 浏览器有一个cookie,name=user-key,标识用户信息

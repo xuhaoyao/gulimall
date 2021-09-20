@@ -1,12 +1,15 @@
 package com.scnu.gulimall.member.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.scnu.common.vo.UserInfoVo;
+import com.scnu.gulimall.member.entity.MemberReceiveAddressEntity;
 import com.scnu.gulimall.member.exception.EmailException;
 import com.scnu.gulimall.member.exception.UserNameException;
 import com.scnu.gulimall.member.feign.CouponFeignService;
+import com.scnu.gulimall.member.service.MemberReceiveAddressService;
 import com.scnu.gulimall.member.to.GiteeTo;
 import com.scnu.gulimall.member.to.UserLoginTo;
 import com.scnu.gulimall.member.to.UserRegisterTo;
@@ -36,6 +39,22 @@ public class MemberController {
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @Autowired
+    private MemberReceiveAddressService memberReceiveAddressService;
+
+    /**
+     * 远程调用,查出用户订单确认页需要的信息以及收货地址
+     * @param id
+     * @return
+     */
+    @GetMapping("/orderConfrimInfo/{id}")
+    public R orderConfrimInfo(@PathVariable("id") Long id){
+        MemberEntity memberInfo = memberService.getById(id);
+        List<MemberReceiveAddressEntity> address = memberReceiveAddressService.memberAddress(id);
+        return R.ok().put("memberInfo",memberInfo).put("address",address);
+    }
+
 
     @PostMapping("/gitee/login")
     public R giteeLogin(@RequestBody GiteeTo to){

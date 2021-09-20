@@ -3,6 +3,8 @@ package com.scnu.gulimall.cart.service;
 import com.scnu.gulimall.cart.vo.CartItemVo;
 import com.scnu.gulimall.cart.vo.CartVo;
 
+import java.util.List;
+
 public interface CartService {
     /**
      * 将商品添加进购物车
@@ -52,4 +54,10 @@ public interface CartService {
      * @param skuId
      */
     void deleteItem(Long skuId);
+
+    /**
+     * 查当前登录用户选中的购物项信息
+     * @return
+     */
+    List<CartItemVo> userCartItemsInfo();
 }
