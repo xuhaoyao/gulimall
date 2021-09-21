@@ -20,7 +20,7 @@ import com.scnu.gulimall.order.service.OrderItemService;
 import com.scnu.gulimall.order.to.MemberInfoTo;
 import com.scnu.gulimall.order.to.OrderCreateTo;
 import com.scnu.gulimall.order.vo.*;
-import io.seata.spring.annotation.GlobalTransactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -74,6 +74,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -145,7 +148,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      * 本地事务,只能控制自己事务的回滚,控制不了其他服务的回滚
      * 分布式事务: 网络问题+分布式机器
      */
-    @GlobalTransactional
+    //@GlobalTransactional  高并发下,不采用seata
     @Transactional
     @Override
     public SubmitOrderRespVo submitOrder(OrderFormVo orderFormVo) {
@@ -188,12 +191,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     //锁定成功
                     vo.setOrder(orderTo.getOrder());
                     //TODO 远程扣减积分  假设出现了异常
-                    int a = 10 / 0;
+                   // int a = 10 / 0;
                     /**
                      * 分布式事务:
                      *      int a = 10 / 0;
                      *      这个时候,订单回滚,库存不回滚,因此库存是远程调用,那边的事务已经提交了
                      */
+                    //订单创建成功,发消息给订单的延迟队列,目的是:一定时间后用户没有操作这个订单,系统自动取消它。
+                    rabbitTemplate.convertAndSend("order-event-exchange","order.create.order",orderTo.getOrder());
                     return vo;
                 }
                 else{
@@ -210,6 +215,25 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //令牌验证失败
             vo.setCode(500);
             return vo;
+        }
+    }
+
+    @Transactional
+    @Override
+    public void orderTryCancel(OrderEntity orderEntity) {
+        //根据订单号得到最新的订单信息
+        String orderSn = orderEntity.getOrderSn();
+        OrderEntity lastOrder = baseMapper.selectOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        //如果是待付款状态,就取消订单
+        if(lastOrder.getStatus() == OrderStatusEnum.CREATE_NEW.getCode()){
+            OrderEntity update = new OrderEntity();
+            update.setId(lastOrder.getId());
+            update.setStatus(OrderStatusEnum.CANCLED.getCode());
+            baseMapper.updateById(update);
+            //注意:此处更新了订单状态之后,需要发一个消息给库存服务,告诉它订单已经取消了,需要把库存解锁
+            //考虑这个情况,若订单超时了需要取消,但是由于网络等原因,订单超时的消息没有传到这个方法,那么订单就一直是
+            //  新建状态,库存服务就不能解锁库存,导致了这个订单的库存就被锁死了
+            rabbitTemplate.convertAndSend("order-event-exchange","order.release.other",orderSn);
         }
     }
 

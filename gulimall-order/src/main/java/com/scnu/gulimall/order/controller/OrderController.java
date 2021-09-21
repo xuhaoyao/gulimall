@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.scnu.common.constant.order.OrderStatusEnum;
 import com.scnu.gulimall.order.entity.OrderReturnApplyEntity;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -33,6 +35,17 @@ public class OrderController {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    /**
+     * 远程调用,rabbitmq解锁库存时查询订单的状态
+     * -1表示订单不存在
+     */
+    @GetMapping("/status/{orderSn}")
+    public R orderStatus(@PathVariable("orderSn") String orderSn){
+        OrderEntity order = orderService.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        Integer status = (order == null ? OrderStatusEnum.MISSING.getCode() : order.getStatus());
+        return R.ok().put("data",status);
+    }
 
     @GetMapping("/sendMsg/{num}")
     public String sendMsg(@PathVariable("num") Integer num){

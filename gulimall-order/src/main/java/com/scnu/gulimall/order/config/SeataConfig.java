@@ -1,5 +1,6 @@
 package com.scnu.gulimall.order.config;
 
+/*
 import com.alibaba.druid.pool.DruidDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import io.seata.rm.datasource.DataSourceProxy;
@@ -23,6 +24,14 @@ public class SeataConfig {
     @Autowired(required = true)
     private DataSourceProperties dataSourceProperties;
 
+    */
+/**
+     * 去掉了自己配置的sqlSessionFactory,直接让DataSource bean返回的是一个被代理过的bean,
+     * 并且加入了@Primary,导致mp优先使用我们配置的数据源,
+     * 这样就解决了mp因为seata代理了数据源跟创建了新的sqlSessionFactory,导致mp的插件,组件失效的bug了
+     * @return
+     *//*
+
     @Primary
     @Bean
     public DataSource dataSource(){
@@ -34,3 +43,4 @@ public class SeataConfig {
         return  new DataSourceProxy(druidDataSource);
     }
 }
+*/

@@ -1,5 +1,6 @@
 package com.scnu.gulimall.ware.config;
 
+/*
 import com.alibaba.druid.pool.DruidDataSource;
 import com.zaxxer.hikari.HikariDataSource;
 import io.seata.rm.datasource.DataSourceProxy;
@@ -38,3 +39,4 @@ public class SeataConfig {
 
 
 }
+*/

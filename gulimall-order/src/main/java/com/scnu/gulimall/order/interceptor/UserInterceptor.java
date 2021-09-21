@@ -3,6 +3,7 @@ package com.scnu.gulimall.order.interceptor;
 import com.scnu.common.constant.auth.AuthConstant;
 import com.scnu.common.vo.UserInfoVo;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,11 @@ public class UserInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        //库存模块，mq的延迟队列需要查订单状态,但此时是mq来查,而不是用户,因此需要单独放行这个请求
+        boolean match = new AntPathMatcher().match("/order/order/status/**", request.getRequestURI());
+        if(match){
+            return true;
+        }
 
         UserInfoVo userInfo = (UserInfoVo) request.getSession().getAttribute(AuthConstant.SESSION_USER_NAME);
         if(userInfo == null){

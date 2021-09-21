@@ -32,5 +32,11 @@ public interface OrderService extends IService<OrderEntity> {
      * @return
      */
     SubmitOrderRespVo submitOrder(OrderFormVo orderFormVo);
+
+    /**
+     * 若这个订单是未付款的状态,那么取消这个订单
+     * @param orderEntity
+     */
+    void orderTryCancel(OrderEntity orderEntity);
 }
 
