@@ -3,12 +3,14 @@ package com.scnu.gulimall.order.service.impl;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.scnu.common.to.SkuHasStockTo;
 import com.scnu.common.utils.R;
 import com.scnu.common.vo.UserInfoVo;
 import com.scnu.gulimall.order.constant.RedisConstant;
 import com.scnu.gulimall.order.dao.OrderItemDao;
 import com.scnu.gulimall.order.entity.OrderItemEntity;
+import com.scnu.gulimall.order.entity.PaymentInfoEntity;
 import com.scnu.gulimall.order.enume.OrderStatusEnum;
 import com.scnu.gulimall.order.exception.NoStockException;
 import com.scnu.gulimall.order.feign.CartFeignService;
@@ -17,6 +19,7 @@ import com.scnu.gulimall.order.feign.ProductFeignService;
 import com.scnu.gulimall.order.feign.WareFeignService;
 import com.scnu.gulimall.order.interceptor.UserInterceptor;
 import com.scnu.gulimall.order.service.OrderItemService;
+import com.scnu.gulimall.order.service.PaymentInfoService;
 import com.scnu.gulimall.order.to.MemberInfoTo;
 import com.scnu.gulimall.order.to.OrderCreateTo;
 import com.scnu.gulimall.order.vo.*;
@@ -77,6 +80,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private PaymentInfoService paymentInfoService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -234,6 +240,89 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             //考虑这个情况,若订单超时了需要取消,但是由于网络等原因,订单超时的消息没有传到这个方法,那么订单就一直是
             //  新建状态,库存服务就不能解锁库存,导致了这个订单的库存就被锁死了
             rabbitTemplate.convertAndSend("order-event-exchange","order.release.other",orderSn);
+        }
+    }
+
+    @Override
+    public PayVo payOrder(String orderSn) {
+        PayVo vo = new PayVo();
+        OrderEntity orderEntity = baseMapper.selectOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
+        vo.setSubject("测试支付...");
+        vo.setOut_trade_no(orderSn);
+        //向上取小数点后两位
+        vo.setTotal_amount(orderEntity.getTotalAmount().setScale(2,BigDecimal.ROUND_UP).toString());
+        return vo;
+    }
+
+    @Override
+    public PageUtils memberOrderList(Map<String, Object> params) {
+        UserInfoVo userInfoVo = UserInterceptor.userInfoThreadLocal.get();
+        QueryWrapper<OrderEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("member_id",userInfoVo.getId())
+                .orderByAsc("status")
+                .orderByDesc("modify_time");
+        IPage<OrderEntity> page = this.page(
+                new Query<OrderEntity>().getPage(params),
+                wrapper
+        );
+        List<OrderEntity> records = page.getRecords();
+        if(ObjectUtils.isNotEmpty(records)){
+            records.forEach(item -> {
+                QueryWrapper<OrderItemEntity> itemWrapper = new QueryWrapper<>();
+                itemWrapper.eq("order_sn",item.getOrderSn());
+                item.setOrderItems(orderItemService.list(itemWrapper));
+            });
+        }
+        return new PageUtils(page);
+    }
+
+    /**
+     * 商户需要验证该通知数据中的 out_trade_no 是否为商户系统中创建的订单号；
+     *
+     * 判断 total_amount 是否确实为该订单的实际金额（即商户订单创建时的金额）；
+     *
+     * 校验通知中的 seller_id（或者 seller_email) 是否为 out_trade_no 这笔单据的对应的操作方
+     * （有的时候，一个商户可能有多个 seller_id/seller_email）；
+     *
+     * 验证 app_id 是否为该商户本身。
+     *
+     * 上述 1、2、3、4 有任何一个验证不通过，则表明本次通知是异常通知，务必忽略。
+     * 在上述验证通过后商户必须根据支付宝不同类型的业务通知，正确的进行不同的业务处理，
+     * 并且过滤重复的通知结果数据。在支付宝的业务通知中，
+     * 只有交易通知状态为 TRADE_SUCCESS 或 TRADE_FINISHED 时，支付宝才会认定为买家付款成功。
+     *
+     * 状态 TRADE_SUCCESS 的通知触发条件是商户签约的产品支持退款功能的前提下，买家付款成功；
+     *
+     * 交易状态 TRADE_FINISHED 的通知触发条件是商户签约的产品不支持退款功能的前提下，买家付款成功；
+     * 或者，商户签约的产品支持退款功能的前提下，交易已经成功并且已经超过可退款期限。
+     */
+    @Transactional
+    @Override
+    public void payOrder(PayAsyncVo vo) {
+
+        /**
+         * 根据支付宝文档,详细的代码编写如下:
+         * 1.数据库中查out_trade_no即orderSn是否存在,返回order对象就好了
+         * 2.查这个订单的应付总额和total_amount是否一致
+         * 3.查seller_id(卖家的支付宝号) 是否为 out_trade_no 这笔单据的对应的操作方
+         * 4.验证 app_id 是否为该商户本身。
+         * 任何一个环节不对,直接抛异常
+         *
+         * 全都通过了,在执行下面的代码
+         */
+
+        //1.oms_payment_info 插入一条订单完成的数据
+        PaymentInfoEntity infoEntity = new PaymentInfoEntity();
+        infoEntity.setOrderSn(vo.getOut_trade_no());
+        infoEntity.setAlipayTradeNo(vo.getTrade_no());
+        infoEntity.setPaymentStatus(vo.getTrade_status());
+        infoEntity.setCallbackTime(vo.getNotify_time());
+        infoEntity.setCreateTime(vo.getNotify_time());
+        infoEntity.setTotalAmount(new BigDecimal(vo.getTotal_amount()));
+        paymentInfoService.save(infoEntity);
+        //2.oms_order 更新订单状态
+        if("TRADE_SUCCESS".equals(vo.getTrade_status()) || "TRADE_FINISHED".equals(vo.getTrade_status())) {
+            baseMapper.updateOrderStatus(vo.getOut_trade_no(), OrderStatusEnum.PAYED.getCode());
         }
     }
 

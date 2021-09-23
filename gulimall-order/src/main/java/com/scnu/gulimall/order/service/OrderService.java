@@ -3,9 +3,7 @@ package com.scnu.gulimall.order.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.scnu.common.utils.PageUtils;
 import com.scnu.gulimall.order.entity.OrderEntity;
-import com.scnu.gulimall.order.vo.OrderConfirmVo;
-import com.scnu.gulimall.order.vo.OrderFormVo;
-import com.scnu.gulimall.order.vo.SubmitOrderRespVo;
+import com.scnu.gulimall.order.vo.*;
 
 import java.util.Map;
 
@@ -38,5 +36,20 @@ public interface OrderService extends IService<OrderEntity> {
      * @param orderEntity
      */
     void orderTryCancel(OrderEntity orderEntity);
+
+    /**
+     * 根据订单号生成发送给支付宝的数据
+     * @param orderSn
+     * @return
+     */
+    PayVo payOrder(String orderSn);
+
+    PageUtils memberOrderList(Map<String, Object> params);
+
+    /**
+     * 用户付款后,支付宝异步回调
+     * @param vo
+     */
+    void payOrder(PayAsyncVo vo);
 }
 

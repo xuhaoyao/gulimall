@@ -16,3 +16,25 @@
 spring:
   profiles:
     active: dev
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+  thymeleaf:
+    cache: false
+
+  session:
+    store-type: redis
+
+  redis:
+    host: 182.92.2.51 #192.168.200.130
+    port: 6379
+    password: aa6631656
+
+#设置feign客户端超时时间
+ribbon:
+  #建立连接
+  ReadTimeout:  5000
+  #远程调用
+  ConnectTimeout: 5000

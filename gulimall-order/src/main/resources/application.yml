@@ -5,6 +5,13 @@ spring:
     url: jdbc:mysql://182.92.2.51:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss   #返回值Date转string的时候,添加上,否则日期错误
+    time-zone: GMT+8
+
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss  #请求参数String转Date的时候,添加上,否则报错
+
   cloud:
     alibaba:
       seata:
@@ -57,3 +64,13 @@ gulimall:
 #feign:
 #  hystrix:
 #    enabled: true
+
+#设置feign客户端超时时间
+ribbon:
+  #建立连接
+  ReadTimeout:  5000
+  #远程调用
+  ConnectTimeout: 5000
+
+
+

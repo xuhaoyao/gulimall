@@ -24,6 +24,9 @@ public class OrderTimeOutListener {
         try {
             orderService.orderTryCancel(orderEntity);
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
+
+            //TODO 订单取消后,需要调用支付宝的收单接口,让用户不能再支付
+
         } catch (Exception e) {
             channel.basicReject(message.getMessageProperties().getDeliveryTag(),true);
         }

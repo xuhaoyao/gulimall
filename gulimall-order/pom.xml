@@ -19,6 +19,12 @@
     </properties>
     <dependencies>
 
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.9.28.ALL</version>
+        </dependency>
+
         <!--seata-->
 <!--        <dependency>
             <groupId>com.alibaba.cloud</groupId>

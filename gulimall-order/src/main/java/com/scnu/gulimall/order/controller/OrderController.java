@@ -36,6 +36,18 @@ public class OrderController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+
+    /**
+     * 远程调用,查询用户的订单列表[付款成功时用于渲染页面]
+     * @param params
+     * @return
+     */
+    @PostMapping("/memberOrderList")
+    public R memberOrderList(@RequestBody Map<String,Object> params){
+        PageUtils page = orderService.memberOrderList(params);
+        return R.ok().put("page", page);
+    }
+
     /**
      * 远程调用,rabbitmq解锁库存时查询订单的状态
      * -1表示订单不存在
