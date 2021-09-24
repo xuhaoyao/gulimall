@@ -11,6 +11,7 @@ import com.scnu.common.utils.Query;
 import com.scnu.gulimall.coupon.dao.CouponSpuRelationDao;
 import com.scnu.gulimall.coupon.entity.CouponSpuRelationEntity;
 import com.scnu.gulimall.coupon.service.CouponSpuRelationService;
+import org.springframework.util.StringUtils;
 
 
 @Service("couponSpuRelationService")
@@ -18,9 +19,10 @@ public class CouponSpuRelationServiceImpl extends ServiceImpl<CouponSpuRelationD
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        QueryWrapper<CouponSpuRelationEntity> wrapper= new QueryWrapper<>();
         IPage<CouponSpuRelationEntity> page = this.page(
                 new Query<CouponSpuRelationEntity>().getPage(params),
-                new QueryWrapper<CouponSpuRelationEntity>()
+                wrapper
         );
 
         return new PageUtils(page);

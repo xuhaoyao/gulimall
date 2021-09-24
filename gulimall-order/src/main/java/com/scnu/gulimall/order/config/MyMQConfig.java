@@ -53,4 +53,16 @@ public class MyMQConfig {
         return new Binding("order.release.order.queue", Binding.DestinationType.QUEUE, "order-event-exchange", "order.release.order", null);
     }
 
+    //秒杀业务添加
+    @Bean
+    public Queue orderSeckillOrderQueue() {
+        return new Queue("order.seckill.order.queue", true, false, false);
+    }
+
+    @Bean
+    public Binding orderSeckillBingding() {
+        return new Binding("order.seckill.order.queue", Binding.DestinationType.QUEUE, "order-event-exchange", "order.seckill.order", null);
+    }
+
+
 }

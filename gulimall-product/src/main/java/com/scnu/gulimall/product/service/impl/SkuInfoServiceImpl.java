@@ -1,14 +1,14 @@
 package com.scnu.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.scnu.common.utils.Query;
+import com.scnu.common.utils.R;
 import com.scnu.gulimall.product.entity.SkuImagesEntity;
 import com.scnu.gulimall.product.entity.SpuInfoDescEntity;
 import com.scnu.gulimall.product.entity.SpuInfoEntity;
+import com.scnu.gulimall.product.feign.SeckillFeign;
 import com.scnu.gulimall.product.service.*;
-import com.scnu.gulimall.product.vo.SkuItemSaleAttrVo;
-import com.scnu.gulimall.product.vo.SkuItemVo;
-import com.scnu.gulimall.product.vo.SpuItemAttrGroupVo;
-import com.scnu.gulimall.product.vo.SpuSaveVo;
+import com.scnu.gulimall.product.vo.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +45,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    private SeckillFeign seckillFeign;
 
     @Autowired
     private ExecutorService pool;
@@ -154,8 +157,17 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             vo.setGroupAttrs(groupAttrs);
         }, pool);
 
+        CompletableFuture<Void> seckillFuture = CompletableFuture.runAsync(() -> {
+            //6.获取秒杀信息(可能在这个时间段没有)
+            R r = seckillFeign.seckillSku(skuId);
+            if(r.getCode() == 0){
+                SeckillSkuVO data = r.getData("data", new TypeReference<SeckillSkuVO>() {});
+                vo.setSeckillSkuVO(data);
+            }
+        }, pool);
+
         try {
-            CompletableFuture.allOf(skuImgFuture,saleAttrsFuture,spuInfoFuture,groupAttrsFuture).get();
+            CompletableFuture.allOf(skuImgFuture,saleAttrsFuture,spuInfoFuture,groupAttrsFuture,seckillFuture).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

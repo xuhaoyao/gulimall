@@ -24,4 +24,7 @@ public class SkuItemVo {
     //6.TODO
     private Boolean hasStock = true;
 
+    //7.当前sku的秒杀信息
+    private SeckillSkuVO seckillSkuVO;
+
 }

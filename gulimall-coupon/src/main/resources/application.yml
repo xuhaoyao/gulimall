@@ -16,3 +16,6 @@
 spring:
   profiles:
     active: dev
+
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss  #请求参数String转Date的时候,添加上,否则报错

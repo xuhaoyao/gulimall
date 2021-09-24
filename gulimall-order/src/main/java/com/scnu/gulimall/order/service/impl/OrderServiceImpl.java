@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.scnu.common.to.SkuHasStockTo;
+import com.scnu.common.to.mq.SeckillOrderTo;
 import com.scnu.common.utils.R;
 import com.scnu.common.vo.UserInfoVo;
 import com.scnu.gulimall.order.constant.RedisConstant;
@@ -324,6 +325,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         if("TRADE_SUCCESS".equals(vo.getTrade_status()) || "TRADE_FINISHED".equals(vo.getTrade_status())) {
             baseMapper.updateOrderStatus(vo.getOut_trade_no(), OrderStatusEnum.PAYED.getCode());
         }
+    }
+
+    @Transactional
+    @Override
+    public void handleSeckillOrder(SeckillOrderTo orderTo) {
+        //TODO
+        System.out.println("处理秒杀订单..." + orderTo);
     }
 
     /**

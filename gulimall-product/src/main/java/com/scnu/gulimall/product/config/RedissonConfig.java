@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RedissonConfig {
 
+    /**
+     * 所有对Redisson的使用都通过RedissonClient
+     */
     @Bean
     public RedissonClient redisson(){
         // 默认连接地址 127.0.0.1:6379

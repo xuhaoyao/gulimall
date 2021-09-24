@@ -1,14 +1,11 @@
 package com.scnu.gulimall.coupon.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scnu.gulimall.coupon.entity.SeckillSessionEntity;
 import com.scnu.gulimall.coupon.service.SeckillSessionService;
@@ -29,6 +26,16 @@ import com.scnu.common.utils.R;
 public class SeckillSessionController {
     @Autowired
     private SeckillSessionService seckillSessionService;
+
+    /**
+     * 秒杀服务远程调用:查询最近x天需要上架的商品
+     */
+    @GetMapping("/seckillLastXDay/{x}")
+    public R seckillLastXDay(@PathVariable("x") Integer x){
+        List<SeckillSessionEntity> sessions = seckillSessionService.seckillLastXDay(x);
+        System.out.println(sessions);
+        return R.ok().put("data",sessions);
+    }
 
     /**
      * 列表

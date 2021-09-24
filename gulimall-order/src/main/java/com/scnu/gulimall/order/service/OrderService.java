@@ -1,6 +1,7 @@
 package com.scnu.gulimall.order.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.scnu.common.to.mq.SeckillOrderTo;
 import com.scnu.common.utils.PageUtils;
 import com.scnu.gulimall.order.entity.OrderEntity;
 import com.scnu.gulimall.order.vo.*;
@@ -51,5 +52,11 @@ public interface OrderService extends IService<OrderEntity> {
      * @param vo
      */
     void payOrder(PayAsyncVo vo);
+
+    /**
+     * 处理秒杀订单
+     * @param orderTo
+     */
+    void handleSeckillOrder(SeckillOrderTo orderTo);
 }
 

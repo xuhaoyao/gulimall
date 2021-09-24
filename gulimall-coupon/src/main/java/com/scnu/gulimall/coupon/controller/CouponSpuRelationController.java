@@ -37,7 +37,6 @@ public class CouponSpuRelationController {
     //@RequiresPermissions("coupon:couponspurelation:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = couponSpuRelationService.queryPage(params);
-
         return R.ok().put("page", page);
     }
 

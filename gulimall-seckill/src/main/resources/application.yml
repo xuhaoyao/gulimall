@@ -1,0 +1,43 @@
+
+spring:
+  session:
+    store-type: redis  #SpringSession配合redis解决分布式下session问题
+  redis:
+    host: 182.92.2.51 #192.168.200.130
+    port: 6379
+    password: aa6631656
+
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 50
+
+  rabbitmq:
+    host: 182.92.2.51
+    port: 5672
+    username: guest
+    password: rencai666..
+    virtual-host: /
+
+server:
+  port: 15000
+
+
+#自定义线程池配置
+gulimall:
+  pool:
+    core-pool-size: 5
+    maximum-pool-size: 20
+    keep-alive-time: 10
+    queue-size: 10000
+
+#设置feign客户端超时时间
+ribbon:
+  #建立连接
+  ReadTimeout:  5000
+  #远程调用
+  ConnectTimeout: 5000
+
+
+
